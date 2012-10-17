@@ -6,3 +6,6 @@ Enhance jQuery.proxy() to run proxied function automatically after n millisecond
 
 Syntax:
   $.proxy( fn, context, timeout )
+
+TODO:
+- Sensible handling of additional fn arguments (because I've broken the way jQuery.proxy() accepts them :(
