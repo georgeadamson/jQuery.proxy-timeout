@@ -1,4 +1,3 @@
-
 (function ($) {
 
     var proxyTimers = {},       // Hash of Timer IDs currently pending.
@@ -8,7 +7,7 @@
     // Pimp jQuery's $.proxy helper with an optional timeout argument.
     // When timeout argument is specified:
     // - The proxied function will run automatically after n milliseconds.
-    // - If you call this again with the same function before the timeout expires, it will be canceled and a new one created*.
+    // - If you call this again with the same function* before the timeout expires, it will be canceled and a new one created.
     // - This method returns the Timer ID instead of the proxy function (Allowing it to be canceled using clearTimeout)
     // - If needed, you can get the proxy function by passing the Timer ID to this method (unless it has expired)
     // ( *This feature is useful for normalising noisy repetitive events such as window-resize, to prevent multiple dupe triggers)
