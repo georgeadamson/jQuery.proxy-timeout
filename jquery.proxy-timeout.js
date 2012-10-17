@@ -1,45 +1,61 @@
+
 (function ($) {
 
     var proxyTimers = {},       // Hash of Timer IDs currently pending.
         proxyFunctions = {},    // Hash of proxy functions currently pending.
-        _proxy = $.proxy;       // Reference to jQuery's original proxy method.
+        $_proxy = $.proxy;      // Reference to jQuery's original proxy method.
 
     // Pimp jQuery's $.proxy helper with an optional timeout argument.
     // When timeout argument is specified:
-    // - The proxied function will run automatically after n milliseconds.
+    // - The proxied function will run n milliseconds after to run the proxy function.
     // - If you call this again with the same function* before the timeout expires, it will be canceled and a new one created.
-    // - This method returns the Timer ID instead of the proxy function (Allowing it to be canceled using clearTimeout)
-    // - If needed, you can get the proxy function by passing the Timer ID to this method (unless it has expired)
-    // ( *This feature is useful for normalising noisy repetitive events such as window-resize, to prevent multiple dupe triggers)
-    $.proxy = function (fn, context, timeout) {
+    // - The proxy function returns the Timer ID instead of the function result (Allowing it to be canceled using clearTimeout)
+    // - If needed, you can get the proxy function itself by passing just the Timer ID to this method (unless it has expired)
+    // - It is functionally equivalent to: setTimeout( function(){ fn.call(context) }, timeout );
+    //   *This feature is useful for normalising noisy repetitive events such as window-resize, to prevent multiple dupe triggers.
+    $.proxy = function (timeout, fn, context) {
 
-        // Helper to return the proxied function for a given Timer ID:
-        if ($.isNumeric(fn)) {
-            return proxyFunctions[fn];
+        if (!$.isNumeric(timeout)) {
 
-        // Revert to jQuery's standard proxy method when no timeout specified:
-        } else if (timeout === undefined) {
-            return _proxy(fn, context);
+            // Revert to jQuery's standard proxy method when no timeout specified:
+            return $_proxy.apply(this, [].slice.call(arguments));
 
-        // Bail out if fn is useless:
-        } else if (!$.isFunction(fn)) {
-            return undefined;
-
-        // Otherwise run the proxy function after specified timeout: (This returns a Timer ID)
         } else {
 
-            clearTimeout(proxyTimers[fn]);
+            // Helper to return the proxied function for a given Timer ID:
+            if (arguments.length === 1) {
+                return proxyFunctions[timeout];
 
-            var proxy = _proxy(fn, context),
+                // Bail out if fn is useless:
+            } else if (!$.isFunction(fn)) {
+                return undefined;
 
-            timer = proxyTimers[fn] = setTimeout(function () {
-                delete proxyFunctions[proxyTimers[fn]];
-                delete proxyTimers[fn];
-                proxy();
-            }, timeout);
+                // Otherwise return proxy function that will run fn after specified timeout: (Proxy returns the Timeout ID)
+            } else {
 
-            proxyFunctions[timer] = proxy;
-            return timer;
+                clearTimeout(proxyTimers[fn]);
+
+                var proxy = $_proxy.apply(this, [].slice.call(arguments, 1)),
+
+                wrapper = function () {
+
+                    var self = this,
+                        args = [].slice.call(arguments),
+
+                    timerId = proxyTimers[fn] = setTimeout(function () {
+                        delete proxyFunctions[proxyTimers[fn]];
+                        delete proxyTimers[fn];
+                        proxy.apply(self, args);
+                    }, timeout);
+
+                    proxyFunctions[timerId] = proxy;
+                    return timerId;
+
+                }
+
+                return wrapper;
+
+            }
 
         }
 
