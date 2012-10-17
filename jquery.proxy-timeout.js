@@ -33,10 +33,8 @@
             var proxy = _proxy(fn, context),
 
             timer = proxyTimers[fn] = setTimeout(function () {
-                console.log(proxyTimers)
                 delete proxyFunctions[proxyTimers[fn]];
                 delete proxyTimers[fn];
-                console.log(proxyTimers)
                 proxy();
             }, timeout);
 
