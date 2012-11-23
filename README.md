@@ -8,5 +8,5 @@ Syntax:
 * $.proxy( fn, context )           // Standard usage
 * $.proxy( timeout, fn, context )  // Enhanced usage
 
-By providing one extra parameter you can make the proxy run after a timeout period.
+By providing one extra parameter you can make the proxied function run after a timeout period.
 The cunning part is that it can be used to automatically dedupe repetitive function calls. See notes in js.
