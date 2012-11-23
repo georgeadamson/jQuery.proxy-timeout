@@ -5,7 +5,8 @@ Enhance jQuery.proxy() to run proxied function automatically after n millisecond
 (Handy for normalizing multiple resize events etc.)
 
 Syntax:
-  $.proxy( fn, context, timeout )
+  $.proxy( fn, context )           // Standard usage
+  $.proxy( timeout, fn, context )  // Enhanced usage
 
-TODO:
-- Sensible handling of additional fn arguments (because I've broken the way jQuery.proxy() accepts them :(
+By providing one extra parameter you can make the proxy run after a timeout period.
+The cunning part is that it can be used to automatically dedupe repetitive function calls. See notes in js.
