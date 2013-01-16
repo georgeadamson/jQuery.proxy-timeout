@@ -1,7 +1,7 @@
 /*! Enhanced jQuery.proxy() method (Pimped with an optional timeout argument)
 *   By providing one extra parameter you can make the proxy run after a timeout period.
 *   The cunning part is that it can be used to automatically dedupe repetitive function calls. See notes.
-*   v1.10.0 - Oct 2012
+*   v1.10.1 - Jan 2013
 *   https://github.com/georgeadamson/jQuery.proxy-timeout
 *   Copyright (c) 2012 George Adamson; Licensed MIT, GPL
 */
@@ -42,23 +42,23 @@
             // Otherwise return proxy function that will run fn after specified timeout: (Proxy returns the Timeout ID)
             } else {
 
-                clearTimeout(proxyTimers[fn]);
-
                 var proxy = jQueryProxy[apply]( this, slice.call(args, 1) ),
 
                 wrapper = function () {
 
-                    var self = this,
-                        args = slice[apply](arguments),
+                  clearTimeout(proxyTimers[fn]);
 
-                    timerId = proxyTimers[fn] = setTimeout(function () {
-                        delete proxyFunctions[proxyTimers[fn]];
-                        delete proxyTimers[fn];
-                        proxy[apply](self, args);
-                    }, timeout);
+                  var self = this,
+                      args = slice[apply](arguments),
 
-                    proxyFunctions[timerId] = proxy;
-                    return timerId;
+                  timerId = proxyTimers[fn] = setTimeout(function () {
+                      delete proxyFunctions[proxyTimers[fn]];
+                      delete proxyTimers[fn];
+                      proxy[apply](self, args);
+                  }, timeout);
+
+                  proxyFunctions[timerId] = proxy;
+                  return timerId;
 
                 };
 
